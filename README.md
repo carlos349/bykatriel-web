@@ -14,7 +14,7 @@ sitio/
 └── .htaccess             Caché y compresión (solo servidores Apache; en los demás se ignora)
 ```
 
-`LEEME.md` es solo esta guía: no hace falta subirlo.
+`README.md` es solo esta guía: no hace falta subirlo al hosting.
 
 ## 1. Antes de subir: pon tu dominio
 
