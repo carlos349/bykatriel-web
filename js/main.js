@@ -192,7 +192,8 @@
         anims = stage.getAnimations({ subtree: true }).filter(function (a) {
           return /^bk-(travel|shade|label)$/.test(a.animationName);
         });
-        anims.forEach(function (a) { a.currentTime = (a.currentTime || 0) + 56000 * 40; });
+        // Se adelanta un múltiplo exacto del ciclo (13 fotos × 5,6 s) para poder arrastrar hacia atrás
+        anims.forEach(function (a) { a.currentTime = (a.currentTime || 0) + 72800 * 30; });
       }
       return anims;
     }
@@ -264,6 +265,44 @@
         rateRing(1);
       }
     });
+  })();
+
+  /* ---------- Carrusel del estudio ---------- */
+
+  // Cambia de foto cada 5 s; se para al usar las flechas y no avanza solo con «reducir movimiento»
+  (function setupStudio() {
+    var box = document.querySelector('.bk-studio');
+    if (!box) return;
+    var slides = box.querySelectorAll('.bk-slide');
+    var count = box.querySelector('.bk-studio-count');
+    var current = 0;
+    var auto = !reduceMotion;
+    var hold = false;
+
+    function pad(n) { return (n < 10 ? '0' : '') + n; }
+    function show(i) {
+      current = (i + slides.length) % slides.length;
+      Array.prototype.forEach.call(slides, function (s, k) {
+        s.classList.toggle('is-on', k === current);
+        if (k === current) s.removeAttribute('aria-hidden');
+        else s.setAttribute('aria-hidden', 'true');
+      });
+      count.textContent = pad(current + 1) + ' / ' + pad(slides.length);
+    }
+
+    box.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-studio]');
+      if (!b) return;
+      auto = false;
+      show(current + Number(b.getAttribute('data-studio')));
+    });
+    box.addEventListener('mouseenter', function () { hold = true; });
+    box.addEventListener('mouseleave', function () { hold = false; });
+    box.addEventListener('focusin', function () { hold = true; });
+    box.addEventListener('focusout', function () { hold = false; });
+    setInterval(function () {
+      if (auto && !hold && !document.hidden) show(current + 1);
+    }, 5000);
   })();
 
   /* ---------- Vídeo del método ---------- */
